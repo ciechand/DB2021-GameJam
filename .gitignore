@@ -3,6 +3,8 @@
 .import/
 export.cfg
 export_presets.cfg
+*.sublime-project
+*.sublime-workspace
 
 # Mono-specific ignores
 .mono/
