@@ -5,6 +5,7 @@ export.cfg
 export_presets.cfg
 *.sublime-project
 *.sublime-workspace
+.Raw/
 
 # Mono-specific ignores
 .mono/
