@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Tiles.png" type="Texture" id=1]
 [ext_resource path="res://HandTile.gd" type="Script" id=2]
@@ -20,12 +20,15 @@ tracks/0/keys = {
 "values": [ Vector2( 0, 0 ), Vector2( 0, 1.5 ), Vector2( 0, 0 ) ]
 }
 
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 5.0435, 5.47459 )
+
 [node name="HandTileNode" type="Node2D"]
 scale = Vector2( 8, 8 )
 
 [node name="HandTile" type="Sprite" parent="."]
 modulate = Color( 0.772549, 0.6, 0.6, 1 )
-position = Vector2( 0, 0.119596 )
+position = Vector2( 0, 0.31286 )
 texture = ExtResource( 1 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 20, 20 )
@@ -47,4 +50,12 @@ anims/Bobbing = SubResource( 1 )
 
 [node name="Tween" type="Tween" parent="HandTile"]
 
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( 0, 1.5 )
+shape = SubResource( 2 )
+
 [connection signal="tween_completed" from="HandTile/Tween" to="HandTile" method="_on_Tween_tween_completed"]
+[connection signal="mouse_entered" from="Area2D" to="HandTile" method="_on_Area2D_mouse_entered"]
+[connection signal="mouse_exited" from="Area2D" to="HandTile" method="_on_Area2D_mouse_exited"]

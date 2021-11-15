@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://Map.gd" type="Script" id=2]
 [ext_resource path="res://StackIcon.png" type="Texture" id=3]
 [ext_resource path="res://Bus.png" type="Texture" id=4]
-[ext_resource path="res://Bus.gd" type="Script" id=5]
+[ext_resource path="res://Tiles.png" type="Texture" id=5]
+[ext_resource path="res://Bus.gd" type="Script" id=6]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 3 )
@@ -27,20 +28,30 @@ script = ExtResource( 2 )
 scale = Vector2( 8, 8 )
 mode = 2
 tile_set = ExtResource( 1 )
-cell_size = Vector2( 19, 19 )
-cell_custom_transform = Transform2D( 16, 10, 0, 20, 0, 0 )
+cell_size = Vector2( 20, 20 )
+cell_custom_transform = Transform2D( 16, 0, 0, 20, 0, 0 )
+cell_half_offset = 1
 cell_tile_origin = 1
 show_collision = true
 centered_textures = true
 format = 1
-tile_data = PoolIntArray( -131065, 536870918, 0, -131064, 5, 0, -65529, 1073741829, 0, -65528, 4, 0, 5, 536870918, 0, 6, 1073741832, 0, 8, 536870916, 0 )
+tile_data = PoolIntArray( 262152, 536870916, 0 )
 
 [node name="Bus" type="Sprite" parent="HexMapNode"]
 position = Vector2( 1096, 751.654 )
 texture = ExtResource( 4 )
-script = ExtResource( 5 )
+script = ExtResource( 6 )
 
 [node name="Tween" type="Tween" parent="HexMapNode/Bus"]
+
+[node name="GhostTile" type="Sprite" parent="HexMapNode"]
+modulate = Color( 1, 1, 1, 0.156863 )
+position = Vector2( -224.86, 439.82 )
+scale = Vector2( 8, 8 )
+texture = ExtResource( 5 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 0, 0, 20, 20 )
 
 [node name="Hand" type="Node2D" parent="."]
 
