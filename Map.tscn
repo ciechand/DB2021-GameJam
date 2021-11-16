@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://Tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://Map.gd" type="Script" id=2]
@@ -6,16 +6,86 @@
 [ext_resource path="res://Bus.png" type="Texture" id=4]
 [ext_resource path="res://Tiles.png" type="Texture" id=5]
 [ext_resource path="res://Bus.gd" type="Script" id=6]
+[ext_resource path="res://BusStatic.png" type="Texture" id=7]
 
 [sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 7 )
+region = Rect2( 0, 0, 16, 35 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 4 )
+region = Rect2( 16, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 4 )
+region = Rect2( 32, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 4 )
+region = Rect2( 48, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 4 )
+region = Rect2( 64, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 4 )
+region = Rect2( 80, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 4 )
+region = Rect2( 96, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 4 )
+region = Rect2( 112, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 4 )
+region = Rect2( 128, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 4 )
+region = Rect2( 144, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 4 )
+region = Rect2( 160, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 4 )
+region = Rect2( 176, 0, 16, 43 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 4 )
+region = Rect2( 192, 0, 16, 43 )
+
+[sub_resource type="SpriteFrames" id=15]
+animations = [ {
+"frames": [ SubResource( 1 ) ],
+"loop": true,
+"name": "Default",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ) ],
+"loop": false,
+"name": "Entrance",
+"speed": 10.0
+} ]
+
+[sub_resource type="AtlasTexture" id=16]
 atlas = ExtResource( 3 )
 region = Rect2( 0, 0, 20, 21 )
 
-[sub_resource type="AtlasTexture" id=3]
+[sub_resource type="AtlasTexture" id=17]
 atlas = ExtResource( 3 )
 region = Rect2( 40, 0, 20, 21 )
 
-[sub_resource type="AtlasTexture" id=2]
+[sub_resource type="AtlasTexture" id=18]
 atlas = ExtResource( 3 )
 region = Rect2( 20, 0, 20, 21 )
 
@@ -35,11 +105,13 @@ cell_tile_origin = 1
 show_collision = true
 centered_textures = true
 format = 1
-tile_data = PoolIntArray( 262152, 536870916, 0 )
+tile_data = PoolIntArray( 196615, 14, 0 )
 
-[node name="Bus" type="Sprite" parent="HexMapNode"]
-position = Vector2( 1096, 751.654 )
-texture = ExtResource( 4 )
+[node name="Bus" type="AnimatedSprite" parent="HexMapNode"]
+position = Vector2( 976, 626 )
+frames = SubResource( 15 )
+animation = "Entrance"
+speed_scale = 1.5
 script = ExtResource( 6 )
 
 [node name="Tween" type="Tween" parent="HexMapNode/Bus"]
@@ -53,20 +125,25 @@ centered = false
 region_enabled = true
 region_rect = Rect2( 0, 0, 20, 20 )
 
-[node name="Hand" type="Node2D" parent="."]
+[node name="Camera" type="Camera2D" parent="."]
+anchor_mode = 0
+current = true
 
-[node name="TextureRect" type="TextureButton" parent="."]
+[node name="Hand" type="Node2D" parent="Camera"]
+
+[node name="TextureRect" type="TextureButton" parent="Camera"]
 margin_left = 13.2142
 margin_top = 870.251
 margin_right = 213.214
 margin_bottom = 1070.25
-texture_normal = SubResource( 1 )
-texture_pressed = SubResource( 3 )
-texture_hover = SubResource( 2 )
+texture_normal = SubResource( 16 )
+texture_pressed = SubResource( 17 )
+texture_hover = SubResource( 18 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[connection signal="animation_finished" from="HexMapNode/Bus" to="HexMapNode/Bus" method="_on_Bus_animation_finished"]
 [connection signal="tween_completed" from="HexMapNode/Bus/Tween" to="HexMapNode/Bus" method="_on_Tween_tween_completed"]
-[connection signal="pressed" from="TextureRect" to="." method="_on_TextureRect_pressed"]
+[connection signal="pressed" from="Camera/TextureRect" to="." method="_on_TextureRect_pressed"]

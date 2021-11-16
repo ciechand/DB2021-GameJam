@@ -27,21 +27,19 @@ extents = Vector2( 5.0435, 5.47459 )
 scale = Vector2( 8, 8 )
 
 [node name="HandTile" type="Sprite" parent="."]
-modulate = Color( 0.772549, 0.6, 0.6, 1 )
-position = Vector2( 0, 0.31286 )
+position = Vector2( 0, 1.00421 )
 texture = ExtResource( 1 )
 region_enabled = true
-region_rect = Rect2( 0, 0, 20, 20 )
+region_rect = Rect2( 20, 0, 20, 20 )
 script = ExtResource( 2 )
 
 [node name="Shadow" type="Sprite" parent="HandTile"]
 modulate = Color( 0, 0, 0, 1 )
 show_behind_parent = true
-position = Vector2( -1.06186, -0.117985 )
 texture = ExtResource( 1 )
-offset = Vector2( 0.5, 1.2 )
+offset = Vector2( 0.5, 0.5 )
 region_enabled = true
-region_rect = Rect2( 0, 0, 20, 20 )
+region_rect = Rect2( 20, 0, 20, 20 )
 script = ExtResource( 3 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="HandTile"]
