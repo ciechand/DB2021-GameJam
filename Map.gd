@@ -99,23 +99,28 @@ var IODir = {
 
 var rng = RandomNumberGenerator.new()
 
+var placing = false
 var handTile = preload("res://HandTileTemplate.tscn")
-var hand = []
+var boat = preload("res://Boat.tscn")
+var cactus = preload("res://Cactus.tscn")
+var message = preload("res://Message.tscn")
+var issue = ""
+var hand = [Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(3,0,0)]
 var handShowing = false
 var curTile = -1
 var holding = false
 var tileUntilMove = 3
+var tilePoints = 0
+var points = 0
 var mousePos = Vector2(0,0)
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	rng.randomize()
 
 	#Setting up a starting Hand
-	for i in 50:
-		var randomTile = Tiles[Tiles.keys()[rng.randi()%Tiles.size()]]
-		var randomRotation = rng.randi()%randomTile.size() if randomTile.size()>1 else 0
-		hand.append(randomTile[randomRotation])
+	addRandToHand(10)
 
 	#ghosttile invisibility set
 	$HexMapNode/GhostTile.visible = false
@@ -130,19 +135,42 @@ func _ready():
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed and holding and $Camera/Hand.get_children().size() == 0:
-			placeTile(curTile,worldToMap(mousePos))
+			var placed = placeTile(curTile,worldToMap(mousePos))
+			if !placed:
+				$HexMapNode/GhostTile.modulate = Color(1.0,0.4,0.4)
+				var newMessage = message.instance()
+				newMessage.position = get_viewport().size*Vector2(0.5,0.5)
+				newMessage.get_node("Panel/Text").text = issue
+				$Camera.add_child(newMessage, true)
+			elif event.button_index == BUTTON_LEFT and !event.pressed and holding and $Camera/Hand.get_children().size() == 0:
+				$HexMapNode/GhostTile.modulate = Color(1.0,1.0,1.0)
+
+	if event is InputEventMouseMotion:
+		mousePos = get_global_mouse_position()
+		if $HexMapNode/GhostTile.visible == true:
+			$HexMapNode/GhostTile.position = mapToWorld(worldToMap(mousePos))
+			if $HexMapNode/HexMap.get_cellv(worldToMap(mousePos)) != -1:
+				$HexMapNode/GhostTile.modulate = Color(1.0,0.4,0.4)
+			else:
+				$HexMapNode/GhostTile.modulate = Color(1.0,1.0,1.0)
+
+	if event is InputEventKey:
+		if event.scancode == KEY_L:
+			var newMessage = message.instance()
+			newMessage.position = get_viewport().size*Vector2(0.5,0.5)
+			$Camera.add_child(newMessage, true)
 
 	pass
 
+func addRandToHand(count=1):
+	for i in count:
+		var randomTile = Tiles[Tiles.keys()[rng.randi()%Tiles.size()]]
+		var randomRotation = rng.randi()%randomTile.size() if randomTile.size()>1 else 0
+		hand.append(randomTile[randomRotation])
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	mousePos = get_global_mouse_position()
-	if $HexMapNode/GhostTile.visible == true:
-		$HexMapNode/GhostTile.position = mapToWorld(worldToMap(mousePos))
-		if $HexMapNode/HexMap.get_cellv(worldToMap(mousePos)) != -1:
-			$HexMapNode/GhostTile.modulate = Color(1.0,0.4,0.4)
-		else:
-			$HexMapNode/GhostTile.modulate = Color(1.0,1.0,1.0)
+	$Camera/Points.text = "Points: "+String(points)
 
 	var camera = $Camera
 	if Input.is_action_pressed("ui_up"):
@@ -187,9 +215,10 @@ func mapToWorld(mapPos, offset=false)->Vector2:
 	var offsetVec = Vector2(4,4)+Vector2(19*4,19*4) if offset else Vector2(0,0)
 	return ($HexMapNode/HexMap.map_to_world(mapPos)*8)+offsetVec
 
-func placeTile(handID, mapPos):
+func placeTile(handID, mapPos)->bool:
 	if $HexMapNode/Bus.moving:
-		return
+		issue = "Cannot place Road while Car is Moving."
+		return false
 	var valid = []
 	var inputs = []
 	var adjTiles = queryAdjTiles(mapPos)
@@ -201,13 +230,15 @@ func placeTile(handID, mapPos):
 				if IODir[adjTiles[t]].has((t+3)%6):
 					inputs.append(t)
 	if exit:
-		return
+		issue = "Can only add tile to a space next to the current Map."
+		return false
 
 	if IODir.has(hand[handID]):
 		var curTileIO = IODir[hand[handID]]
 		for i in inputs:
 			if !curTileIO.has(i):
-				return
+				issue = "Output of existing tile Does not align with an input of held tile."
+				return false
 		for c in curTileIO:
 			if hand[handID][0] == 2:
 				break
@@ -226,9 +257,11 @@ func placeTile(handID, mapPos):
 				elif adjTile != -1:
 					valid.append(false)
 		if valid.count(false) > 0:
-			return
-	elif inputs.size() > 0:
-		return
+			issue = "Input/Output of held tile is not aligned with a valid Input/Output."
+			return false
+	elif inputs.size() > 0 and hand[handID][0] != 2:
+		issue = "Held Tile does not have a path, it cannot accept Outputs fom existing tiles."
+		return false
 
 	if $HexMapNode/HexMap.get_cellv(mapPos) == -1:
 
@@ -236,14 +269,92 @@ func placeTile(handID, mapPos):
 
 		#Move the Bus
 		navigatePath($HexMapNode/Bus)
+		
+		var id = int(hand[handID][0])
+		var additive = 0
+		if roads.has(id):
+			additive += 2
+		elif rivers.has(id):
+			additive += 2
+		elif id == 1:
+			additive += 1
+		elif id == 3:
+			additive += 3
+		elif id == 2:
+			additive += 3
+			var boatInstance = boat.instance()
+			$HexMapNode.add_child(boatInstance,true)
+			boatInstance.position = mapToWorld(mapPos,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
+			boatInstance.addMove(boatInstance.position+Vector2(0,1000))
+			#boatInstance.curTile = Vector2(mapPos)
+		else:
+			pass
+		additive += checkPatterns(mapPos)
+		tilePoints += additive
+		points += additive
+
+		if tilePoints >= 5:
+			var deduction = floor(tilePoints/5)
+			addRandToHand(deduction)
+			tilePoints -= deduction*5
 
 		#Clear the hand
 		hand.remove(handID)
 		curTile = -1
 		holding = false
 		$HexMapNode/GhostTile.visible = false
+	return true
 
-	pass
+func checkPatterns(checkTile)->int:
+	var tileID = $HexMapNode/HexMap.get_cellv(checkTile)
+	if !([1,2,3]+rivers).has(tileID):
+		return 0
+	var surroundingTiles = queryAdjTiles(checkTile)
+	var add = 0
+	if tileID == 3:
+		for t in surroundingTiles:
+			if t[0] != 1:
+				return 0
+		add += 15
+		for d in 6:
+			var dir = evenDirections[d] if int(checkTile.x)%2 == 0 else oddDirections[d]
+			for i in 2:
+				var cactusInstance = cactus.instance()
+				$HexMapNode.add_child(cactusInstance,true)
+				cactusInstance.position = mapToWorld(checkTile+dir,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
+				cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
+	elif tileID == 1:
+		for t1 in surroundingTiles.size():
+			if surroundingTiles[t1][0] == 3:
+				var dir = evenDirections[t1] if int(checkTile.x)%2 == 0 else oddDirections[t1]
+				var adjTiles = queryAdjTiles(checkTile+dir)
+				for t2 in adjTiles:
+					if t2[0] != 1:
+						return 0
+				add += 15
+				for d in 6:
+					var dir2 = evenDirections[d] if int((checkTile+dir).x)%2 == 0 else oddDirections[d]
+					for i in 2:
+						var cactusInstance = cactus.instance()
+						$HexMapNode.add_child(cactusInstance,true)
+						cactusInstance.position = mapToWorld(checkTile+dir+dir2,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
+						cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
+	elif tileID == 2:
+		for t in surroundingTiles:
+			if !rivers.has(int(t[0])):
+				return 0
+		add += 20
+	elif rivers.has(tileID):
+		for t1 in surroundingTiles.size():
+			if surroundingTiles[t1][0] == 2:
+				var dir = evenDirections[t1] if int(checkTile.x)%2 == 0 else oddDirections[t1]
+				var adjTiles = queryAdjTiles(checkTile+dir)
+				for t2 in adjTiles:
+					if !rivers.has(int(t2[0])):
+						return 0
+				add += 15
+	return add
+
 
 func grabTile(tile):
 	_on_TextureRect_pressed()
@@ -272,20 +383,25 @@ func queryTile(tilePos,dir=-1):
 		return Vector3(targetTile,$HexMapNode/HexMap.is_cell_x_flipped(targetTilePos.x,targetTilePos.y),$HexMapNode/HexMap.is_cell_y_flipped(targetTilePos.x,targetTilePos.y))
 
 func navigatePath(obj,interations=-1):
+	var path = []
 	var ct = 0
-	var curBusTilePos = obj.curBusTile
-	var dirNum = IODir[queryTile(curBusTilePos)].duplicate()
+	var curTilePos = obj.curTile
+	var dirNum = IODir[queryTile(curTilePos)].duplicate()
 	dirNum.erase(obj.previousDirection)
-	var dir = evenDirections[dirNum[0]] if int(curBusTilePos.x)%2 == 0 else oddDirections[dirNum[0]]
-	var nextTilePos = curBusTilePos+dir
-	while queryTile(curBusTilePos,dirNum[0])[0] != -1:
+	var dir = evenDirections[dirNum[0]] if int(curTilePos.x)%2 == 0 else oddDirections[dirNum[0]]
+	var nextTilePos = curTilePos+dir
+	while queryTile(curTilePos,dirNum[0])[0] != -1:
+		if path.has(curTilePos):
+			tilePoints += path.size()
+			return
+		path.append(curTilePos)
 		obj.previousDirection = (dirNum[0]+3)%6
 		obj.addMove(mapToWorld(nextTilePos,true))
-		curBusTilePos = nextTilePos
+		curTilePos = nextTilePos
 		dirNum = IODir[queryTile(nextTilePos)].duplicate()
 		dirNum.erase(obj.previousDirection)
-		dir = evenDirections[dirNum[0]] if int(curBusTilePos.x)%2 == 0 else oddDirections[dirNum[0]]
-		nextTilePos = curBusTilePos+dir
+		dir = evenDirections[dirNum[0]] if int(curTilePos.x)%2 == 0 else oddDirections[dirNum[0]]
+		nextTilePos = curTilePos+dir
 		ct += 1
 		if interations != -1 and ct >= interations:
 			break
