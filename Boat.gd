@@ -8,6 +8,7 @@ var moving = false
 var movingQueue = []
 var curTile = Vector2(7,3)
 var rng = RandomNumberGenerator.new()
+var previousDirection = -1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -18,6 +19,8 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if !moving:
+		get_parent().get_parent().navigateRiver(self)
 	pass
 
 func addMove(worldPos):
@@ -27,7 +30,7 @@ func addMove(worldPos):
 	pass
 
 func moveTo():
-	$Tween.interpolate_property(self, "position", null, movingQueue[0], 1.5,$Tween.TRANS_EXPO,$Tween.EASE_OUT,0.1)
+	$Tween.interpolate_property(self, "position", null, movingQueue[0], 5,$Tween.TRANS_LINEAR,$Tween.EASE_OUT,0.1)
 	$Tween.start()
 	moving = true
 	movingQueue.remove(0)

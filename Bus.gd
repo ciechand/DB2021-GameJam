@@ -48,6 +48,7 @@ func _on_Tween_tween_completed(object, key):
 		else:
 			moveTo()
 		curTile = get_parent().get_parent().worldToMap(position)
+		#get_parent().get_parent().points += 1
 	pass # Replace with function body.
 
 

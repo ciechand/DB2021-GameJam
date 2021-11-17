@@ -24,8 +24,8 @@ var oddDirections = {
 	5:Vector2(1,1),
 };
 
-var roads = [4,5,6,7,8,15]
-var rivers = [9,10,11,12,13,16]
+var roads = [4,5,6,7,8,15,17]
+var rivers = [9,10,11,12,13,16,18]
 
 var Tiles = {
 	"Desert":[Vector3(1,0,0)],
@@ -46,6 +46,8 @@ var Tiles = {
 	"Road-3-5":[Vector3(5,1,1)],
 	"Road-1-2":[Vector3(15,0,0)],
 	"Road-4-5":[Vector3(15,1,0)],
+	"Road-0-2-4":[Vector3(17,0,0)],
+	"Road-1-3-5":[Vector3(17,0,1)],
 	"River-0-1":[Vector3(11,0,0)],
 	"River-0-2":[Vector3(10,0,0)],
 	"River-0-3":[Vector3(9,0,0)],
@@ -61,9 +63,16 @@ var Tiles = {
 	"River-3-5":[Vector3(10,1,1)],
 	"River-1-2":[Vector3(16,0,0)],
 	"River-4-5":[Vector3(16,1,0)],
+	"River-0-2-4":[Vector3(18,0,0)],
+	"River-1-3-5":[Vector3(18,0,1)],
+
 };
 
 var IODir = {
+	Vector3(2,0,0):[0,1,2,3,4,5],
+	Vector3(2,0,1):[0,1,2,3,4,5],
+	Vector3(2,1,0):[0,1,2,3,4,5],
+	Vector3(2,1,1):[0,1,2,3,4,5],
 	Vector3(4,0,0):[0,3],
 	Vector3(5,0,0):[0,2],
 	Vector3(5,0,1):[3,1],
@@ -95,6 +104,10 @@ var IODir = {
 	Vector3(15,1,0):[4,5],
 	Vector3(16,0,0):[1,2],
 	Vector3(16,1,0):[4,5],
+	Vector3(17,0,0):[0,2,4],
+	Vector3(17,0,1):[1,3,5],
+	Vector3(18,0,0):[0,2,4],
+	Vector3(18,0,1):[1,3,5],
 };
 
 var rng = RandomNumberGenerator.new()
@@ -105,7 +118,7 @@ var boat = preload("res://Boat.tscn")
 var cactus = preload("res://Cactus.tscn")
 var message = preload("res://Message.tscn")
 var issue = ""
-var hand = [Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(3,0,0)]
+var hand = [Vector3(2,0,0)]
 var handShowing = false
 var curTile = -1
 var holding = false
@@ -120,11 +133,11 @@ func _ready():
 	rng.randomize()
 
 	#Setting up a starting Hand
-	addRandToHand(10)
+	addRandToHand(50)
 
 	#ghosttile invisibility set
 	$HexMapNode/GhostTile.visible = false
-
+	$Camera/HandButton.grab_focus()
 	#Preparing the bus
 	var busStart = mapToWorld(Vector2(7,3),true)
 	$HexMapNode/Bus.position = busStart+Vector2(0,-14)
@@ -132,16 +145,24 @@ func _ready():
 	pass
 
 
+func printMessage(messageText=issue,messagetype=0):
+	var newMessage = message.instance()
+	newMessage.position = get_viewport().size*Vector2(0.5,0.5)
+	newMessage.get_node("Panel/Text").text = messageText
+	$Camera.add_child(newMessage, true)
+	if messagetype == 0:
+		newMessage.get_node("Panel").set("custom_styles/panel", load("res://ErrorMessage.tres"))
+	elif messagetype ==1:
+		newMessage.get_node("Panel").set("custom_styles/panel", load("res://InfoMessage.tres"))
+	pass
+
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed and holding and $Camera/Hand.get_children().size() == 0:
 			var placed = placeTile(curTile,worldToMap(mousePos))
 			if !placed:
 				$HexMapNode/GhostTile.modulate = Color(1.0,0.4,0.4)
-				var newMessage = message.instance()
-				newMessage.position = get_viewport().size*Vector2(0.5,0.5)
-				newMessage.get_node("Panel/Text").text = issue
-				$Camera.add_child(newMessage, true)
+				printMessage()
 			elif event.button_index == BUTTON_LEFT and !event.pressed and holding and $Camera/Hand.get_children().size() == 0:
 				$HexMapNode/GhostTile.modulate = Color(1.0,1.0,1.0)
 
@@ -156,9 +177,7 @@ func _input(event):
 
 	if event is InputEventKey:
 		if event.scancode == KEY_L:
-			var newMessage = message.instance()
-			newMessage.position = get_viewport().size*Vector2(0.5,0.5)
-			$Camera.add_child(newMessage, true)
+			printMessage("LOREM IPSUM!")
 
 	pass
 
@@ -166,7 +185,13 @@ func addRandToHand(count=1):
 	for i in count:
 		var randomTile = Tiles[Tiles.keys()[rng.randi()%Tiles.size()]]
 		var randomRotation = rng.randi()%randomTile.size() if randomTile.size()>1 else 0
+		var handCount = hand.count(randomTile[randomRotation])
+		while handCount > 2: 
+			randomTile = Tiles[Tiles.keys()[rng.randi()%Tiles.size()]]
+			randomRotation = rng.randi()%randomTile.size() if randomTile.size()>1 else 0
+			handCount = hand.count(randomTile[randomRotation])
 		hand.append(randomTile[randomRotation])
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -227,65 +252,72 @@ func placeTile(handID, mapPos)->bool:
 		if adjTiles[t][0] != -1:
 			exit = false
 			if IODir.has(adjTiles[t]):
-				if IODir[adjTiles[t]].has((t+3)%6):
+				if IODir[adjTiles[t]].has((t+3)%6) and adjTiles[t][0] != 2:
 					inputs.append(t)
 	if exit:
 		issue = "Can only add tile to a space next to the current Map."
 		return false
-
-	if IODir.has(hand[handID]):
-		var curTileIO = IODir[hand[handID]]
-		for i in inputs:
-			if !curTileIO.has(i):
-				issue = "Output of existing tile Does not align with an input of held tile."
-				return false
-		for c in curTileIO:
-			if hand[handID][0] == 2:
-				break
-			var adjTile = int(adjTiles[c][0])
-			var handTile = int(hand[handID][0])
-			if  inputs.has(c):
-				if roads.has(handTile) and (roads.has(adjTile) or adjTile == 14): 
-					valid.append(true)
-				elif rivers.has(handTile) and (rivers.has(adjTile) or adjTile == 2):
-					valid.append(true)
+	if hand[handID][0] != 2:
+		if IODir.has(hand[handID]):
+			var curTileIO = IODir[hand[handID]]
+			for i in inputs:
+				if !curTileIO.has(i):
+					issue = "Output of existing tile Does not align with an input of held tile."
+					return false
+			for c in curTileIO:
+				var adjTile = int(adjTiles[c][0])
+				var handTile = int(hand[handID][0])
+				if  inputs.has(c):
+					if roads.has(handTile) and (roads.has(adjTile) or adjTile == 14): 
+						pass
+					elif rivers.has(handTile) and (rivers.has(adjTile) or adjTile == 2):
+						pass
+					else:
+						issue = "Roads cannot connect to Rivers and Visa-Versa."
+						return false
 				else:
-					valid.append(false)
-			else:
-				if (rivers.has(handTile) and adjTile == 2):
-					valid.append (true)
-				elif adjTile != -1:
-					valid.append(false)
-		if valid.count(false) > 0:
-			issue = "Input/Output of held tile is not aligned with a valid Input/Output."
-			return false
-	elif inputs.size() > 0 and hand[handID][0] != 2:
-		issue = "Held Tile does not have a path, it cannot accept Outputs fom existing tiles."
-		return false
+					if (rivers.has(handTile) and adjTile == 2):
+						pass
+					elif adjTile != -1:
+						issue = "Output from held tile cannot align with side without input."
+						return false
+		elif inputs.size() > 0:
+			if hand[handID][0] != 2:
+				issue = "Held Tile does not have a path, it cannot accept Outputs fom existing tiles."
+				return false
+			elif hand[handID][0] == 2:
+				for t in adjTiles:
+					if roads.has(t[0]) or t[0] == 14:
+						issue = "This Bus is not designed for water travel."
+						return false
+			
 
 	if $HexMapNode/HexMap.get_cellv(mapPos) == -1:
 
 		$HexMapNode/HexMap.set_cellv(mapPos,hand[handID][0],hand[handID][1],hand[handID][2])
 
 		#Move the Bus
-		navigatePath($HexMapNode/Bus)
+		navigateRoad($HexMapNode/Bus, mapPos)
 		
 		var id = int(hand[handID][0])
 		var additive = 0
 		if roads.has(id):
-			additive += 2
-		elif rivers.has(id):
-			additive += 2
-		elif id == 1:
 			additive += 1
+		elif rivers.has(id):
+			additive += 1
+		elif id == 1:
+			additive += 2
 		elif id == 3:
-			additive += 3
+			additive += 5
 		elif id == 2:
-			additive += 3
+			additive += 5
 			var boatInstance = boat.instance()
 			$HexMapNode.add_child(boatInstance,true)
 			boatInstance.position = mapToWorld(mapPos,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
 			boatInstance.addMove(boatInstance.position+Vector2(0,1000))
+			boatInstance.curTile = mapPos
+			navigateRiver(boatInstance)
+			printMessage("Happy Sailing!",1)
 			#boatInstance.curTile = Vector2(mapPos)
 		else:
 			pass
@@ -323,6 +355,7 @@ func checkPatterns(checkTile)->int:
 				$HexMapNode.add_child(cactusInstance,true)
 				cactusInstance.position = mapToWorld(checkTile+dir,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
 				cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
+				printMessage("Dance Party!",1)
 	elif tileID == 1:
 		for t1 in surroundingTiles.size():
 			if surroundingTiles[t1][0] == 3:
@@ -339,9 +372,10 @@ func checkPatterns(checkTile)->int:
 						$HexMapNode.add_child(cactusInstance,true)
 						cactusInstance.position = mapToWorld(checkTile+dir+dir2,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
 						cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
+						printMessage("Dance Party!",1)
 	elif tileID == 2:
 		for t in surroundingTiles:
-			if !rivers.has(int(t[0])):
+			if !rivers.has(int(t[0])) and t[0] != 2:
 				return 0
 		add += 20
 	elif rivers.has(tileID):
@@ -350,7 +384,7 @@ func checkPatterns(checkTile)->int:
 				var dir = evenDirections[t1] if int(checkTile.x)%2 == 0 else oddDirections[t1]
 				var adjTiles = queryAdjTiles(checkTile+dir)
 				for t2 in adjTiles:
-					if !rivers.has(int(t2[0])):
+					if !rivers.has(int(t2[0])) and t2[0] != 2:
 						return 0
 				add += 15
 	return add
@@ -382,27 +416,54 @@ func queryTile(tilePos,dir=-1):
 	else:
 		return Vector3(targetTile,$HexMapNode/HexMap.is_cell_x_flipped(targetTilePos.x,targetTilePos.y),$HexMapNode/HexMap.is_cell_y_flipped(targetTilePos.x,targetTilePos.y))
 
-func navigatePath(obj,interations=-1):
+func navigateRoad(obj,placedTile):
 	var path = []
-	var ct = 0
+	var count = 0
 	var curTilePos = obj.curTile
-	var dirNum = IODir[queryTile(curTilePos)].duplicate()
-	dirNum.erase(obj.previousDirection)
-	var dir = evenDirections[dirNum[0]] if int(curTilePos.x)%2 == 0 else oddDirections[dirNum[0]]
-	var nextTilePos = curTilePos+dir
-	while queryTile(curTilePos,dirNum[0])[0] != -1:
-		if path.has(curTilePos):
-			tilePoints += path.size()
+	var IO = IODir[queryTile(curTilePos)].duplicate()
+	while true:
+		if count >= 1000:
+			for i in 100:
+				printMessage("GAME OVER")
+			return	
+		var outputs = []
+		var validOutputs = []
+		for o in IO:
+			var dir = evenDirections[o] if int(curTilePos.x)%2 == 0 else oddDirections[o]
+			if curTilePos+dir == placedTile and count == 0:
+				outputs = [o]
+				break
+			if queryTile(curTilePos, o)[0] != -1 and (o != obj.previousDirection and queryTile(curTilePos, o)[0] != 14):
+				outputs.append(o)
+			elif queryTile(curTilePos,o)[0] == -1 and count != 0:
+				validOutputs.append(o)
+		if outputs.size() == 0 or validOutputs.size()>0:
+			#print("EMPTY PATH")
 			return
-		path.append(curTilePos)
-		obj.previousDirection = (dirNum[0]+3)%6
-		obj.addMove(mapToWorld(nextTilePos,true))
-		curTilePos = nextTilePos
-		dirNum = IODir[queryTile(nextTilePos)].duplicate()
-		dirNum.erase(obj.previousDirection)
-		dir = evenDirections[dirNum[0]] if int(curTilePos.x)%2 == 0 else oddDirections[dirNum[0]]
-		nextTilePos = curTilePos+dir
-		ct += 1
-		if interations != -1 and ct >= interations:
-			break
+		var finalOutput = outputs[rng.randi()%outputs.size()]
+		var dir = evenDirections[finalOutput] if int(curTilePos.x)%2 == 0 else oddDirections[finalOutput]
+		obj.previousDirection = (finalOutput+3)%6
+		curTilePos = curTilePos+dir
+		obj.addMove(mapToWorld(curTilePos,true))
+		if queryTile(curTilePos)[0] == -1:
+			return
+		IO = IODir[queryTile(curTilePos)].duplicate()
+		count += 1
+	pass
+
+func navigateRiver(obj):
+	var curTilePos = obj.curTile
+	var IO = IODir[queryTile(curTilePos)].duplicate()
+	var outputs = []
+	for o in IO:
+		var tile = int(queryTile(curTilePos, o)[0])
+		if tile != -1 and o != obj.previousDirection and (rivers.has(tile) or tile == 2) and IODir[queryTile(curTilePos,o)].has((o+3)%6):
+			outputs.append(o)
+	if outputs.size() == 0:
+		#print("EMPTY PATH")
+		return
+	var finalOutput = outputs[rng.randi()%outputs.size()]
+	var dir = evenDirections[finalOutput] if int(curTilePos.x)%2 == 0 else oddDirections[finalOutput]
+	obj.previousDirection = (finalOutput+3)%6
+	obj.addMove(mapToWorld(curTilePos+dir,true))
 	pass
