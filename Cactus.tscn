@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://cactus.png" type="Texture" id=1]
-[ext_resource path="res://Boat.gd" type="Script" id=2]
+[ext_resource path="res://Cactus.gd" type="Script" id=2]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 1 )
@@ -29,7 +29,6 @@ animations = [ {
 
 [node name="Cactus" type="AnimatedSprite"]
 frames = SubResource( 5 )
-frame = 1
 playing = true
 script = ExtResource( 2 )
 

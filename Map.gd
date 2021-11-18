@@ -116,9 +116,11 @@ var placing = false
 var handTile = preload("res://HandTileTemplate.tscn")
 var boat = preload("res://Boat.tscn")
 var cactus = preload("res://Cactus.tscn")
+var stopSign = preload("res://stopSign.tscn")
 var message = preload("res://Message.tscn")
 var issue = ""
-var hand = [Vector3(2,0,0)]
+var hand = [Vector3(4,0,0),Vector3(4,0,0),Vector3(4,0,0),Vector3(4,0,0),]
+var handStaging = []
 var handShowing = false
 var curTile = -1
 var holding = false
@@ -127,13 +129,12 @@ var tilePoints = 0
 var points = 0
 var mousePos = Vector2(0,0)
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	rng.randomize()
 
 	#Setting up a starting Hand
-	addRandToHand(50)
+	addRandToHand(20)
 
 	#ghosttile invisibility set
 	$HexMapNode/GhostTile.visible = false
@@ -158,12 +159,12 @@ func printMessage(messageText=issue,messagetype=0):
 
 func _input(event):
 	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_LEFT and event.pressed and holding and $Camera/Hand.get_children().size() == 0:
+		if event.button_index == BUTTON_LEFT and event.pressed and holding and $Camera/Hand/Display.get_children().size() == 0:
 			var placed = placeTile(curTile,worldToMap(mousePos))
 			if !placed:
 				$HexMapNode/GhostTile.modulate = Color(1.0,0.4,0.4)
 				printMessage()
-			elif event.button_index == BUTTON_LEFT and !event.pressed and holding and $Camera/Hand.get_children().size() == 0:
+			elif event.button_index == BUTTON_LEFT and !event.pressed and holding and $Camera/Hand/Display.get_children().size() == 0:
 				$HexMapNode/GhostTile.modulate = Color(1.0,1.0,1.0)
 
 	if event is InputEventMouseMotion:
@@ -181,6 +182,15 @@ func _input(event):
 
 	pass
 
+func _on_Timer_timeout():
+	if handStaging.size() > 0:
+		var tempTile = handTile.instance()
+		$Camera/Hand.add_child(tempTile, true)
+		tempTile.get_node("HandTile").spawn(handStaging[0][0], handStaging[0][1])
+		hand.append(handStaging[0][0])
+		handStaging.remove(0)
+	pass
+
 func addRandToHand(count=1):
 	for i in count:
 		var randomTile = Tiles[Tiles.keys()[rng.randi()%Tiles.size()]]
@@ -190,7 +200,8 @@ func addRandToHand(count=1):
 			randomTile = Tiles[Tiles.keys()[rng.randi()%Tiles.size()]]
 			randomRotation = rng.randi()%randomTile.size() if randomTile.size()>1 else 0
 			handCount = hand.count(randomTile[randomRotation])
-		hand.append(randomTile[randomRotation])
+		handStaging.append([randomTile[randomRotation],i])
+
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -210,7 +221,7 @@ func _process(delta):
 
 func _on_TextureRect_pressed():
 	if handShowing:
-		for i in $Camera/Hand.get_children():
+		for i in $Camera/Hand/Display.get_children():
 			i.get_node("HandTile").hideHand()
 		handShowing = !handShowing
 	else:
@@ -223,7 +234,7 @@ func _on_TextureRect_pressed():
 			tempHandTile.position = Vector2((sin(angle)*dist)+halfWindowSize.x,(cos(angle)*dist)+halfWindowSize.y)
 			tempHandTile.get_node("HandTile").tileData = hand[i]
 			tempHandTile.get_node("HandTile").handID = i
-			$Camera/Hand.add_child(tempHandTile, true)
+			$Camera/Hand/Display.add_child(tempHandTile, true)
 			tempHandTile.get_node("HandTile").showHand()
 		handShowing = !handShowing
 		holding = false
@@ -302,7 +313,7 @@ func placeTile(handID, mapPos)->bool:
 		var id = int(hand[handID][0])
 		var additive = 0
 		if roads.has(id):
-			additive += 1
+			additive += 2
 		elif rivers.has(id):
 			additive += 1
 		elif id == 1:
@@ -339,7 +350,7 @@ func placeTile(handID, mapPos)->bool:
 
 func checkPatterns(checkTile)->int:
 	var tileID = $HexMapNode/HexMap.get_cellv(checkTile)
-	if !([1,2,3]+rivers).has(tileID):
+	if !([1,2,3,4]+rivers).has(tileID):
 		return 0
 	var surroundingTiles = queryAdjTiles(checkTile)
 	var add = 0
@@ -387,6 +398,39 @@ func checkPatterns(checkTile)->int:
 					if !rivers.has(int(t2[0])) and t2[0] != 2:
 						return 0
 				add += 15
+	elif tileID == 4:
+		var upTile = surroundingTiles[3]
+		var downTile = surroundingTiles[0]
+		if upTile[0] == 4 and downTile[0] == 4:
+			var signInstance = stopSign.instance()
+			$HexMapNode.add_child(signInstance,true)
+			signInstance.position = mapToWorld(checkTile,true)+Vector2(30,0)-Vector2(0,1000)
+			signInstance.addMove(signInstance.position+Vector2(0,1000))	
+			printMessage("No one to pick up! As usual.",1)
+			add += 10
+			pass
+		elif upTile[0] == 4:
+			var dir = evenDirections[3] if int(checkTile.x)%2 == 0 else oddDirections[3]
+			var upupTile = queryTile(checkTile+dir,3)
+			if upupTile[0] == 4:
+				var signInstance = stopSign.instance()
+				$HexMapNode.add_child(signInstance,true)
+				signInstance.position = mapToWorld(checkTile+dir,true)+Vector2(30,0)-Vector2(0,1000)
+				signInstance.addMove(signInstance.position+Vector2(0,1000))	
+				printMessage("No one to pick up! As usual.",1)
+				add += 10
+				pass
+		elif downTile[0] ==4:
+			var dir = evenDirections[0] if int(checkTile.x)%2 == 0 else oddDirections[0]
+			var downdownTile = queryTile(checkTile+dir,0)
+			if downdownTile[0] == 4:
+				var signInstance = stopSign.instance()
+				$HexMapNode.add_child(signInstance,true)
+				signInstance.position = mapToWorld(checkTile+dir,true)+Vector2(30,0)-Vector2(0,1000)
+				signInstance.addMove(signInstance.position+Vector2(0,1000))	
+				printMessage("No one to pick up! As usual.",1)
+				add += 10
+				pass
 	return add
 
 
@@ -425,24 +469,32 @@ func navigateRoad(obj,placedTile):
 		if count >= 1000:
 			for i in 100:
 				printMessage("GAME OVER")
+				$Camera/ExitButton.visible = true
+				$Camera/ExitButton.disabled = false
 			return	
 		var outputs = []
-		var validOutputs = []
+		var validOutputs = [] 
 		for o in IO:
 			var dir = evenDirections[o] if int(curTilePos.x)%2 == 0 else oddDirections[o]
 			if curTilePos+dir == placedTile and count == 0:
 				outputs = [o]
 				break
 			if queryTile(curTilePos, o)[0] != -1 and (o != obj.previousDirection and queryTile(curTilePos, o)[0] != 14):
-				outputs.append(o)
+				if !path.has([curTilePos,o]):
+					outputs.append(o)
 			elif queryTile(curTilePos,o)[0] == -1 and count != 0:
-				validOutputs.append(o)
-		if outputs.size() == 0 or validOutputs.size()>0:
-			#print("EMPTY PATH")
-			return
+				if path.has([curTilePos,o]):
+					validOutputs.append(o)
+		if outputs.size() == 0:
+			if validOutputs.size() !=0:
+				outputs = validOutputs
+			else:
+				#print("EMPTY PATH")
+				return
 		var finalOutput = outputs[rng.randi()%outputs.size()]
 		var dir = evenDirections[finalOutput] if int(curTilePos.x)%2 == 0 else oddDirections[finalOutput]
 		obj.previousDirection = (finalOutput+3)%6
+		path.append([curTilePos,finalOutput])
 		curTilePos = curTilePos+dir
 		obj.addMove(mapToWorld(curTilePos,true))
 		if queryTile(curTilePos)[0] == -1:
@@ -466,4 +518,7 @@ func navigateRiver(obj):
 	var dir = evenDirections[finalOutput] if int(curTilePos.x)%2 == 0 else oddDirections[finalOutput]
 	obj.previousDirection = (finalOutput+3)%6
 	obj.addMove(mapToWorld(curTilePos+dir,true))
+	pass
+func _on_Exit_button_pressed():
+	get_tree().change_scene("res://MainMenu.tscn")
 	pass

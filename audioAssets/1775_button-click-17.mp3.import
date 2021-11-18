@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/1775_button-click-17.mp3-1c401247ebdb99eebf1606b4b022ac2f.mp3str"
+
+[deps]
+
+source_file="res://audioAssets/1775_button-click-17.mp3"
+dest_files=[ "res://.import/1775_button-click-17.mp3-1c401247ebdb99eebf1606b4b022ac2f.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

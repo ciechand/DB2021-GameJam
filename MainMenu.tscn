@@ -1,0 +1,99 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://DroidSans.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://menuButtons.png" type="Texture" id=2]
+[ext_resource path="res://MainMenu.gd" type="Script" id=3]
+[ext_resource path="res://audioAssets/infinitely-Ambient-Music.mp3" type="AudioStream" id=4]
+[ext_resource path="res://audioAssets/1778_button-click-20.mp3" type="AudioStream" id=5]
+
+[sub_resource type="DynamicFont" id=1]
+size = 80
+font_data = ExtResource( 1 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 80, 80 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 80, 80, 80 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 2 )
+region = Rect2( 160, 0, 80, 80 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 2 )
+region = Rect2( 160, 80, 80, 80 )
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -1.49829
+margin_right = -1.49829
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="RichTextLabel" parent="."]
+margin_left = 760.0
+margin_top = 150.0
+margin_right = 1160.0
+margin_bottom = 450.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/normal_font = SubResource( 1 )
+bbcode_enabled = true
+bbcode_text = "[center]Toilsome
+Tiling
+Tour[/center]"
+text = "Toilsome
+Tiling
+Tour"
+scroll_active = false
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="NewGame" type="TextureButton" parent="."]
+margin_left = 341.414
+margin_top = 600.0
+margin_right = 381.414
+margin_bottom = 640.0
+rect_scale = Vector2( 10, 10 )
+texture_normal = SubResource( 2 )
+texture_hover = SubResource( 3 )
+expand = true
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="Exit" type="TextureButton" parent="."]
+margin_left = 1180.0
+margin_top = 600.0
+margin_right = 1220.0
+margin_bottom = 640.0
+rect_scale = Vector2( 10, 10 )
+texture_normal = SubResource( 4 )
+texture_hover = SubResource( 5 )
+expand = true
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="BackgroundPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+volume_db = -15.0
+autoplay = true
+
+[node name="SoundsPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -10.0
+
+[connection signal="pressed" from="NewGame" to="." method="_on_NewGame_pressed"]
+[connection signal="pressed" from="Exit" to="." method="_on_Exit_pressed"]

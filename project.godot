@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="Db 2021- Game Jam"
-run/main_scene="res://Map.tscn"
+run/main_scene="res://MainMenu.tscn"
 config/icon="res://icon.png"
 
 [display]

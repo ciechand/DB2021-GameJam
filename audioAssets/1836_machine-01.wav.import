@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/1836_machine-01.wav-d09098f457f7aa39d42563ac7188a80d.sample"
+
+[deps]
+
+source_file="res://audioAssets/1836_machine-01.wav"
+dest_files=[ "res://.import/1836_machine-01.wav-d09098f457f7aa39d42563ac7188a80d.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=true
+compress/mode=0

@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Calm-and-Peaceful.mp3-f3cd7b1717e7c4e0b91e8a5382521677.mp3str"
+
+[deps]
+
+source_file="res://audioAssets/Calm-and-Peaceful.mp3"
+dest_files=[ "res://.import/Calm-and-Peaceful.mp3-f3cd7b1717e7c4e0b91e8a5382521677.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

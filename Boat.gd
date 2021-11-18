@@ -30,7 +30,7 @@ func addMove(worldPos):
 	pass
 
 func moveTo():
-	$Tween.interpolate_property(self, "position", null, movingQueue[0], 5,$Tween.TRANS_LINEAR,$Tween.EASE_OUT,0.1)
+	$Tween.interpolate_property(self, "position", null, movingQueue[0], 3,$Tween.TRANS_LINEAR,$Tween.EASE_OUT,0.1)
 	$Tween.start()
 	moving = true
 	movingQueue.remove(0)

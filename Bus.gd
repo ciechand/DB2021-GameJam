@@ -17,13 +17,18 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _process(delta):
+	if $busAudioPlayer.volume_db > -35 and !moving:
+		$busAudioPlayer.volume_db -= 0.5
+	elif $busAudioPlayer.volume_db < -25 and moving:
+		$busAudioPlayer.volume_db += 0.5
+	pass
 
 func addMove(worldPos):
 	movingQueue.append(worldPos)
 	if !moving:
 		moveTo()
+
 	pass
 
 func moveTo():

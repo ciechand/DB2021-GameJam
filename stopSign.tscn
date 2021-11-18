@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://stopSign.png" type="Texture" id=1]
+[ext_resource path="res://stopSign.gd" type="Script" id=2]
+
+[sub_resource type="Animation" id=2]
+length = 2.0
+loop = true
+
+[node name="Sign" type="Sprite"]
+position = Vector2( 0.699536, 0.271653 )
+texture = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "Sway"
+anims/Sway = SubResource( 2 )
+
+[node name="Tween" type="Tween" parent="."]
+
+[connection signal="tween_completed" from="Tween" to="." method="_on_Tween_tween_completed"]
