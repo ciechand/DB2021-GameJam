@@ -241,8 +241,25 @@ stream = ExtResource( 10 )
 volume_db = -20.0
 autoplay = true
 
+[node name="Controls" type="AcceptDialog" parent="."]
+pause_mode = 2
+visible = true
+margin_left = 665.0
+margin_top = 389.0
+margin_right = 1285.0
+margin_bottom = 589.0
+window_title = "Controls"
+dialog_text = "WASD = move Tile map
+Spacebar (button in bottom left of screen) = Open/Close hand of tiles
+Left Mouse Click = Choose Tile from hand AND place tile on map"
+dialog_autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [connection signal="animation_finished" from="HexMapNode/Bus" to="HexMapNode/Bus" method="_on_Bus_animation_finished"]
 [connection signal="tween_completed" from="HexMapNode/Bus/Tween" to="HexMapNode/Bus" method="_on_Tween_tween_completed"]
 [connection signal="timeout" from="Camera/Hand/Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="Camera/HandButton" to="." method="_on_TextureRect_pressed"]
 [connection signal="pressed" from="Camera/ExitButton" to="." method="_on_Exit_button_pressed"]
+[connection signal="confirmed" from="Controls" to="." method="_on_Controls_confirmed"]

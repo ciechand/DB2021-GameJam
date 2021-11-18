@@ -1,0 +1,147 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://Credits.gd" type="Script" id=1]
+
+[sub_resource type="AtlasTexture" id=1]
+region = Rect2( 0, 0, 25, 25 )
+
+[sub_resource type="ProceduralSky" id=2]
+
+[sub_resource type="Environment" id=3]
+background_mode = 1
+background_sky = SubResource( 2 )
+background_color = Color( 0.45098, 0.87451, 0.894118, 1 )
+ambient_light_color = Color( 0.913725, 0.917647, 0.192157, 1 )
+fog_enabled = true
+fog_color = Color( 0.839216, 0.760784, 0.588235, 1 )
+fog_sun_color = Color( 1, 0.901961, 0.701961, 1 )
+fog_depth_begin = 0.0
+fog_depth_end = 90.0
+
+[sub_resource type="PlaneMesh" id=4]
+size = Vector2( 50, 120 )
+
+[sub_resource type="SpatialMaterial" id=5]
+uv1_scale = Vector3( 1, 0.5, 1 )
+uv1_offset = Vector3( 0, 10, 0 )
+
+[sub_resource type="QuadMesh" id=6]
+size = Vector2( 5000, 5000 )
+
+[sub_resource type="SpatialMaterial" id=7]
+albedo_color = Color( 0.85098, 0.698039, 0.0784314, 1 )
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="TextureButton" type="TextureButton" parent="."]
+margin_right = 1920.0
+margin_bottom = 1080.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture_normal = SubResource( 1 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+margin_right = 1920.0
+margin_bottom = 1080.0
+rect_rotation = 0.0255593
+mouse_filter = 2
+stretch = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewport" type="Viewport" parent="ViewportContainer"]
+size = Vector2( 1920, 1080 )
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Spatial" type="Spatial" parent="ViewportContainer/Viewport"]
+
+[node name="Skybox" type="WorldEnvironment" parent="ViewportContainer/Viewport/Spatial"]
+environment = SubResource( 3 )
+
+[node name="Road" type="MeshInstance" parent="ViewportContainer/Viewport/Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50.054 )
+mesh = SubResource( 4 )
+material/0 = SubResource( 5 )
+
+[node name="Desert" type="MeshInstance" parent="ViewportContainer/Viewport/Spatial/Road"]
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, -0.1, -11.946 )
+mesh = SubResource( 6 )
+material/0 = SubResource( 7 )
+
+[node name="Main Camera" type="Camera" parent="ViewportContainer/Viewport/Spatial"]
+transform = Transform( 1, 0, 0, 0, 0.94324, 0.332112, 0, -0.332112, 0.94324, 0, 5, 0 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1920.0
+margin_bottom = 1080.0
+mouse_filter = 2
+color = Color( 0.278431, 0.278431, 0.278431, 0.686275 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ColorRect"]
+margin_left = 49.5017
+margin_top = 38.9916
+margin_right = 1009.5
+margin_bottom = 578.992
+rect_scale = Vector2( 1.8, 1.8 )
+mouse_filter = 2
+bbcode_enabled = true
+bbcode_text = "[center]Game Design:
+Daniel Ciechanowksi
+
+Programming:
+Daniel Ciechanowski
+
+Art:
+Daniel Ciechanowski
+
+Sound:
+Various sound effects courtesy of SoundGator
+Music Courtesy of LesFM and Keys of the Moon on Chosic.com
+
+Special Thanks:
+I would like to specially thank Loading Ready Run for hosting this amazing fundraiser every year, and for being amazing people all around.
+This charity event has been a shining light every year, and this year (2021) in particular, the positivity that all the people involved bring to the world makes it a significantly better place.
+
+I would also like to thank famout in the LRR discord for hosting this game jam every year, it was a peasure to participate and will be an absolute pleasure to participate in the future.
+
+[color=black]Click To go Back to Menu
+[/color]
+[/center]"
+text = "Game Design:
+Daniel Ciechanowksi
+
+Programming:
+Daniel Ciechanowski
+
+Art:
+Daniel Ciechanowski
+
+Sound:
+Various sound effects courtesy of SoundGator
+Music Courtesy of LesFM and Keys of the Moon on Chosic.com
+
+Special Thanks:
+I would like to specially thank Loading Ready Run for hosting this amazing fundraiser every year, and for being amazing people all around.
+This charity event has been a shining light every year, and this year (2021) in particular, the positivity that all the people involved bring to the world makes it a significantly better place.
+
+I would also like to thank famout in the LRR discord for hosting this game jam every year, it was a peasure to participate and will be an absolute pleasure to participate in the future.
+
+Click To go Back to Menu
+
+"
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="pressed" from="TextureButton" to="." method="_on_TextureButton_pressed"]

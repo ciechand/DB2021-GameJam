@@ -20,9 +20,9 @@ func _on_NewGame_pressed():
 	get_tree().change_scene("res://Map.tscn")
 	pass
 
-func _on_Options_pressed():
-	#get_tree().change_scene("res://Options.tscn")
+func _on_Credits_pressed():
 	$SoundsPlayer.play()
+	get_tree().change_scene("res://Credits.tscn")
 	pass
 
 func _on_Exit_pressed():

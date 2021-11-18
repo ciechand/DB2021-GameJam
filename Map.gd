@@ -31,41 +31,12 @@ var Tiles = {
 	"Desert":[Vector3(1,0,0)],
 	"Water":[Vector3(2,0,0),Vector3(2,0,1),Vector3(2,1,0),Vector3(2,1,1)],
 	"Cactus":[Vector3(3,0,0),Vector3(3,1,0)],
-	"Road-0-1":[Vector3(6,0,0)],
-	"Road-0-2":[Vector3(5,0,0)],
-	"Road-0-3":[Vector3(4,0,0)],
-	"Road-0-4":[Vector3(5,1,0)],
-	"Road-0-5":[Vector3(6,1,0)],
-	"Road-1-3":[Vector3(5,0,1)],
-	"Road-1-4":[Vector3(7,0,1)],
-	"Road-1-5":[Vector3(8,0,0)],
-	"Road-2-3":[Vector3(6,0,1)],
-	"Road-2-4":[Vector3(8,0,1)],
-	"Road-2-5":[Vector3(7,0,0)],
-	"Road-3-4":[Vector3(6,1,1)],
-	"Road-3-5":[Vector3(5,1,1)],
-	"Road-1-2":[Vector3(15,0,0)],
-	"Road-4-5":[Vector3(15,1,0)],
-	"Road-0-2-4":[Vector3(17,0,0)],
-	"Road-1-3-5":[Vector3(17,0,1)],
-	"River-0-1":[Vector3(11,0,0)],
-	"River-0-2":[Vector3(10,0,0)],
-	"River-0-3":[Vector3(9,0,0)],
-	"River-0-4":[Vector3(10,1,0)],
-	"River-0-5":[Vector3(11,1,0)],
-	"River-1-3":[Vector3(10,0,1)],
-	"River-1-4":[Vector3(10,0,1)],
-	"River-1-5":[Vector3(13,0,0)],
-	"River-2-3":[Vector3(11,0,1)],
-	"River-2-4":[Vector3(10,0,1)],
-	"River-2-5":[Vector3(13,0,0)],
-	"River-3-4":[Vector3(11,1,1)],
-	"River-3-5":[Vector3(10,1,1)],
-	"River-1-2":[Vector3(16,0,0)],
-	"River-4-5":[Vector3(16,1,0)],
-	"River-0-2-4":[Vector3(18,0,0)],
-	"River-1-3-5":[Vector3(18,0,1)],
-
+	"Road1":[Vector3(6,0,0),Vector3(5,0,0),Vector3(4,0,0),Vector3(5,1,0),Vector3(6,1,0),Vector3(5,0,1),Vector3(7,0,1),Vector3(8,0,0),Vector3(6,0,1),Vector3(8,0,1),Vector3(7,0,0),Vector3(6,1,1),Vector3(5,1,1),Vector3(15,0,0),Vector3(15,1,0),Vector3(17,0,0),Vector3(17,0,1)],
+	"Road2":[Vector3(6,0,0),Vector3(5,0,0),Vector3(4,0,0),Vector3(5,1,0),Vector3(6,1,0),Vector3(5,0,1),Vector3(7,0,1),Vector3(8,0,0),Vector3(6,0,1),Vector3(8,0,1),Vector3(7,0,0),Vector3(6,1,1),Vector3(5,1,1),Vector3(15,0,0),Vector3(15,1,0),Vector3(17,0,0),Vector3(17,0,1)],
+	"Road3":[Vector3(6,0,0),Vector3(5,0,0),Vector3(4,0,0),Vector3(5,1,0),Vector3(6,1,0),Vector3(5,0,1),Vector3(7,0,1),Vector3(8,0,0),Vector3(6,0,1),Vector3(8,0,1),Vector3(7,0,0),Vector3(6,1,1),Vector3(5,1,1),Vector3(15,0,0),Vector3(15,1,0),Vector3(17,0,0),Vector3(17,0,1)],
+	"River1":[Vector3(11,0,0),Vector3(10,0,0),Vector3(9,0,0),Vector3(10,1,0),Vector3(11,1,0),Vector3(10,0,1),Vector3(10,0,1),Vector3(13,0,0),Vector3(11,0,1),Vector3(10,0,1),Vector3(13,0,0),Vector3(11,1,1),Vector3(10,1,1),Vector3(16,0,0),Vector3(16,1,0),Vector3(18,0,0),Vector3(18,0,1)],
+	"River2":[Vector3(11,0,0),Vector3(10,0,0),Vector3(9,0,0),Vector3(10,1,0),Vector3(11,1,0),Vector3(10,0,1),Vector3(10,0,1),Vector3(13,0,0),Vector3(11,0,1),Vector3(10,0,1),Vector3(13,0,0),Vector3(11,1,1),Vector3(10,1,1),Vector3(16,0,0),Vector3(16,1,0),Vector3(18,0,0),Vector3(18,0,1)],
+	"River3":[Vector3(11,0,0),Vector3(10,0,0),Vector3(9,0,0),Vector3(10,1,0),Vector3(11,1,0),Vector3(10,0,1),Vector3(10,0,1),Vector3(13,0,0),Vector3(11,0,1),Vector3(10,0,1),Vector3(13,0,0),Vector3(11,1,1),Vector3(10,1,1),Vector3(16,0,0),Vector3(16,1,0),Vector3(18,0,0),Vector3(18,0,1)],
 };
 
 var IODir = {
@@ -119,7 +90,7 @@ var cactus = preload("res://Cactus.tscn")
 var stopSign = preload("res://stopSign.tscn")
 var message = preload("res://Message.tscn")
 var issue = ""
-var hand = [Vector3(4,0,0),Vector3(4,0,0),Vector3(4,0,0),Vector3(4,0,0),]
+var hand = [Vector3(3,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),Vector3(1,0,0),]
 var handStaging = []
 var handShowing = false
 var curTile = -1
@@ -129,8 +100,14 @@ var tilePoints = 0
 var points = 0
 var mousePos = Vector2(0,0)
 
+func _on_Controls_confirmed():
+	get_tree().paused = false
+	pass
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$Controls.popup()
+	get_tree().paused = true
 	rng.randomize()
 
 	#Setting up a starting Hand
@@ -313,9 +290,9 @@ func placeTile(handID, mapPos)->bool:
 		var id = int(hand[handID][0])
 		var additive = 0
 		if roads.has(id):
-			additive += 2
+			additive += 3
 		elif rivers.has(id):
-			additive += 1
+			additive += 2
 		elif id == 1:
 			additive += 2
 		elif id == 3:
@@ -356,34 +333,36 @@ func checkPatterns(checkTile)->int:
 	var add = 0
 	if tileID == 3:
 		for t in surroundingTiles:
-			if t[0] != 1:
+			if t[0] != 1 and t[0] != 3:
 				return 0
 		add += 15
 		for d in 6:
 			var dir = evenDirections[d] if int(checkTile.x)%2 == 0 else oddDirections[d]
-			for i in 2:
-				var cactusInstance = cactus.instance()
-				$HexMapNode.add_child(cactusInstance,true)
-				cactusInstance.position = mapToWorld(checkTile+dir,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
-				cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
-				printMessage("Dance Party!",1)
+			if queryTile(checkTile+dir)[0] == 1:
+				for i in 2:
+					var cactusInstance = cactus.instance()
+					$HexMapNode.add_child(cactusInstance,true)
+					cactusInstance.position = mapToWorld(checkTile+dir,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
+					cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
+					printMessage("Dance Party!",1)
 	elif tileID == 1:
 		for t1 in surroundingTiles.size():
 			if surroundingTiles[t1][0] == 3:
 				var dir = evenDirections[t1] if int(checkTile.x)%2 == 0 else oddDirections[t1]
 				var adjTiles = queryAdjTiles(checkTile+dir)
 				for t2 in adjTiles:
-					if t2[0] != 1:
+					if t2[0] != 1 and t2[0] != 3:
 						return 0
 				add += 15
 				for d in 6:
 					var dir2 = evenDirections[d] if int((checkTile+dir).x)%2 == 0 else oddDirections[d]
-					for i in 2:
-						var cactusInstance = cactus.instance()
-						$HexMapNode.add_child(cactusInstance,true)
-						cactusInstance.position = mapToWorld(checkTile+dir+dir2,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
-						cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
-						printMessage("Dance Party!",1)
+					if queryTile(checkTile+dir+dir2)[0] == 1:
+						for i in 2:
+							var cactusInstance = cactus.instance()
+							$HexMapNode.add_child(cactusInstance,true)
+							cactusInstance.position = mapToWorld(checkTile+dir+dir2,true)+Vector2(rng.randi()%80,rng.randi()%80)-Vector2(40,40)-Vector2(0,1000)
+							cactusInstance.addMove(cactusInstance.position+Vector2(0,1000))	
+							printMessage("Dance Party!",1)
 	elif tileID == 2:
 		for t in surroundingTiles:
 			if !rivers.has(int(t[0])) and t[0] != 2:

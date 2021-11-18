@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://DroidSans.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://menuButtons.png" type="Texture" id=2]
@@ -25,6 +25,14 @@ region = Rect2( 160, 0, 80, 80 )
 [sub_resource type="AtlasTexture" id=5]
 atlas = ExtResource( 2 )
 region = Rect2( 160, 80, 80, 80 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 2 )
+region = Rect2( 80, 0, 80, 80 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 2 )
+region = Rect2( 80, 80, 80, 80 )
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -95,5 +103,20 @@ autoplay = true
 stream = ExtResource( 5 )
 volume_db = -10.0
 
+[node name="Credits" type="TextureButton" parent="."]
+margin_left = 760.0
+margin_top = 600.0
+margin_right = 800.0
+margin_bottom = 640.0
+rect_scale = Vector2( 10, 10 )
+texture_normal = SubResource( 6 )
+texture_hover = SubResource( 7 )
+expand = true
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
 [connection signal="pressed" from="NewGame" to="." method="_on_NewGame_pressed"]
 [connection signal="pressed" from="Exit" to="." method="_on_Exit_pressed"]
+[connection signal="pressed" from="Credits" to="." method="_on_Credits_pressed"]
